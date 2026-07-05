@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCB — Báo cáo Phân tích Chuyên sâu &amp; Hệ sinh thái</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#121a30; --panel2:#1a2440; --ink:#e8edf7; --muted:#9aa7c2;
+    --line:#27324f; --accent:#e30613; --accent2:#ff4d5e; --good:#2ecc71; --warn:#f4b740;
+    --bad:#ff5a65; --blue:#4d9bff; --purple:#9b6dff; --teal:#27d6c4;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:linear-gradient(180deg,#0b1020,#0d1326 40%,#0b1020);color:var(--ink);
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.55;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+  header.hero{padding:54px 20px 40px;background:radial-gradient(1200px 400px at 20% -10%,rgba(227,6,19,.22),transparent 60%),
+    radial-gradient(900px 380px at 90% 0%,rgba(77,155,255,.16),transparent 55%);border-bottom:1px solid var(--line)}
+  .hero-inner{max-width:1180px;margin:0 auto;padding:0 20px}
+  .tag{display:inline-block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2);
+    border:1px solid rgba(255,77,94,.4);padding:5px 12px;border-radius:30px;background:rgba(227,6,19,.08)}
+  h1{font-size:clamp(30px,5vw,52px);margin:16px 0 6px;line-height:1.05;font-weight:800;letter-spacing:-.5px}
+  h1 .sub{display:block;font-size:.42em;font-weight:500;color:var(--muted);letter-spacing:.02em;margin-top:10px}
+  .meta-row{display:flex;flex-wrap:wrap;gap:18px;margin-top:18px;color:var(--muted);font-size:14px}
+  .meta-row b{color:var(--ink)}
+  .grid{display:grid;gap:18px}
+  section{margin-top:46px}
+  h2{font-size:24px;margin:0 0 6px;display:flex;align-items:center;gap:10px}
+  h2 .n{font-size:14px;color:var(--accent2);border:1px solid var(--line);border-radius:8px;
+    padding:2px 9px;background:var(--panel)}
+  .lead{color:var(--muted);margin:0 0 20px;max-width:880px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:16px;padding:22px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;position:relative;overflow:hidden}
+  .kpi .lab{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .kpi .val{font-size:30px;font-weight:800;margin:6px 0 2px}
+  .kpi .note{font-size:12.5px;color:var(--muted)}
+  .kpi .spark{position:absolute;right:-6px;top:-6px;font-size:60px;opacity:.07}
+  .pos{color:var(--good)} .neg{color:var(--bad)} .neu{color:var(--warn)}
+  .verdict{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+  .score-ring{width:150px;height:150px;border-radius:50%;display:grid;place-items:center;
+    background:conic-gradient(var(--good) 0 72%,var(--line) 72% 100%);position:relative}
+  .score-ring::after{content:"";position:absolute;inset:12px;border-radius:50%;background:var(--panel)}
+  .score-ring .inner{position:relative;text-align:center;z-index:2}
+  .score-ring .inner b{font-size:34px;display:block;line-height:1}
+  .score-ring .inner span{font-size:11px;color:var(--muted)}
+  .badge{display:inline-block;padding:6px 14px;border-radius:8px;font-weight:700;font-size:15px}
+  .badge.buy{background:rgba(46,204,113,.16);color:var(--good);border:1px solid rgba(46,204,113,.4)}
+  .chartbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .chartbox h3{margin:0 0 4px;font-size:16px}
+  .chartbox p{margin:0 0 14px;font-size:13px;color:var(--muted)}
+  .chart-h{position:relative;height:300px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+  @media(max-width:860px){.two,.three{grid-template-columns:1fr}.verdict{grid-template-columns:1fr;text-align:center;justify-items:center}}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  .pill{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+  .pill.g{background:rgba(46,204,113,.15);color:var(--good)}
+  .pill.r{background:rgba(255,90,101,.15);color:var(--bad)}
+  .pill.y{background:rgba(244,183,64,.15);color:var(--warn)}
+  ul.clean{list-style:none;padding:0;margin:0}
+  ul.clean li{padding:9px 0 9px 28px;position:relative;border-bottom:1px solid var(--line)}
+  ul.clean li:last-child{border-bottom:none}
+  ul.clean li::before{position:absolute;left:0;top:9px;font-size:15px}
+  ul.pro li::before{content:"✓";color:var(--good)}
+  ul.con li::before{content:"!";color:var(--bad);font-weight:800}
+  ul.q li::before{content:"?";color:var(--blue);font-weight:800}
+  /* ecosystem map */
+  .eco{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+  .node{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--panel);text-align:center}
+  .node .role{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .node .name{font-weight:700;font-size:15px;margin:3px 0}
+  .node .own{font-size:12.5px;color:var(--accent2);font-weight:600}
+  .node.center{border-color:var(--accent);background:linear-gradient(180deg,rgba(227,6,19,.18),var(--panel2));grid-column:2}
+  .node.person{border-style:dashed}
+  .arrowrow{text-align:center;color:var(--muted);font-size:12px;margin:2px 0}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:12.5px;color:var(--muted)}
+  .legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .disclaimer{margin-top:40px;border:1px solid rgba(244,183,64,.35);background:rgba(244,183,64,.06);
+    border-radius:14px;padding:18px;font-size:13px;color:#e7d9b8}
+  .src{font-size:12.5px;color:var(--muted);word-break:break-all}
+  .src a{color:var(--blue);text-decoration:none}
+  footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center}
+  .anchor-nav{position:sticky;top:0;z-index:20;background:rgba(11,16,32,.85);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:10px 0}
+  .anchor-nav .wrap{display:flex;gap:8px;flex-wrap:wrap;padding:0 20px}
+  .anchor-nav a{font-size:12.5px;color:var(--muted);text-decoration:none;padding:5px 11px;border-radius:8px;border:1px solid transparent}
+  .anchor-nav a:hover{color:var(--ink);border-color:var(--line);background:var(--panel)}
+  .callout{border-left:3px solid var(--accent);padding:10px 16px;background:rgba(227,6,19,.06);border-radius:0 10px 10px 0;margin:14px 0;font-size:14px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="tag">Deep Research · Phân tích cơ bản &amp; Hệ sinh thái</span>
+    <h1>TCB — Techcombank
+      <span class="sub">Cổ phiếu này có đáng đầu tư dài hạn không? · HOSE: TCB</span>
+    </h1>
+    <div class="meta-row">
+      <span>📅 Cập nhật dữ liệu: <b>Q1/2026 &amp; báo cáo môi giới T12/2025</b></span>
+      <span>🔬 Nguồn: <b>2 vòng deep-research · 46 nguồn · 210 agent · 49 claim verify đối nghịch</b></span>
+      <span>⚖️ <b>Không phải khuyến nghị đầu tư</b></span>
+    </div>
+  </div>
+</header>
+
+<nav class="anchor-nav">
+  <div class="wrap">
+    <a href="#verdict">Kết luận</a>
+    <a href="#kpi">Chỉ số chính</a>
+    <a href="#asset">Chất lượng TS</a>
+    <a href="#profit">Sinh lời</a>
+    <a href="#valuation">Định giá</a>
+    <a href="#eco">Hệ sinh thái</a>
+    <a href="#risk">Rủi ro</a>
+    <a href="#targets">Khuyến nghị</a>
+    <a href="#sources">Nguồn</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- VERDICT -->
+<section id="verdict">
+  <div class="card verdict">
+    <div class="score-ring">
+      <div class="inner"><b>7.2</b><span>/10 dài hạn</span></div>
+    </div>
+    <div>
+      <span class="badge buy">ĐÁNG ĐẦU TƯ — CÓ ĐIỀU KIỆN</span>
+      <p style="margin:14px 0 10px;font-size:15.5px">
+        TCB là ngân hàng tư nhân <b>chất lượng top đầu</b>: tài sản tốt nhất hệ thống,
+        CASA số 1, vốn mạnh, định giá hợp lý, và <b>cả 3 CTCK phủ sóng đều khuyến nghị MUA/OUTPERFORM</b>.
+      </p>
+      <div class="callout">
+        ⚠️ <b>Biến số quyết định:</b> mức độ tập trung bất động sản &amp; rủi ro <b>bên liên quan</b> trong hệ sinh thái
+        gia đình Hồ Hùng Anh (Masterise · One Mount) — cao nhất ngành. Lợi nhuận dài hạn gắn chặt với chu kỳ địa ốc.
+        Ban lãnh đạo đang chủ động giảm tỷ trọng BĐS (lần đầu &lt;30% vào Q1/2026).
+      </div>
+      <p style="margin:6px 0 0;color:var(--muted);font-size:14px">
+        <b>Phù hợp:</b> NĐT dài hạn tin chu kỳ BĐS hồi phục &amp; chấp nhận rủi ro tập trung &nbsp;·&nbsp;
+        <b>Thận trọng:</b> ai e ngại đòn bẩy địa ốc / quản trị "sân sau" hoặc cần cổ tức tiền mặt cao.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- KPI -->
+<section id="kpi">
+  <h2><span class="n">01</span> Chỉ số chính (snapshot)</h2>
+  <p class="lead">Số liệu thực tế gần nhất (Q3/2025 – FY2025 – Q1/2026) từ công bố của TCB và báo cáo môi giới.</p>
+  <div class="cards">
+    <div class="kpi"><div class="spark">🛡️</div><div class="lab">NPL (nợ xấu)</div><div class="val pos">~1,1%</div><div class="note">Thấp nhất hệ thống · bao phủ ~120-128%</div></div>
+    <div class="kpi"><div class="spark">💧</div><div class="lab">CASA</div><div class="val pos">42,5%</div><div class="note">Dẫn đầu ngành · kỷ lục 272 nghìn tỷ</div></div>
+    <div class="kpi"><div class="spark">📈</div><div class="lab">LNTT 2025</div><div class="val">32.538 tỷ</div><div class="note pos">+18,2% YoY</div></div>
+    <div class="kpi"><div class="spark">⚙️</div><div class="lab">ROE / ROA</div><div class="val">~16% / 2,4%</div><div class="note neu">ROE dưới median ngành (18,5%)</div></div>
+    <div class="kpi"><div class="spark">📉</div><div class="lab">NIM (12T)</div><div class="val neu">3,8%</div><div class="note neg">Giảm từ 4,2% · đã ổn định 2 quý</div></div>
+    <div class="kpi"><div class="spark">🏦</div><div class="lab">CAR</div><div class="val pos">14,6-15,8%</div><div class="note">Nhóm cao nhất · nhờ IPO TCBS</div></div>
+    <div class="kpi"><div class="spark">🏠</div><div class="lab">Tỷ trọng BĐS</div><div class="val neg">28,9%</div><div class="note">Cao nhất ngành · lần đầu &lt;30% (Q1/26)</div></div>
+    <div class="kpi"><div class="spark">💰</div><div class="lab">Cổ tức tiền mặt</div><div class="val neu">~2,6-2,8%</div><div class="note">2026: 7% tiền + 60% cổ phiếu</div></div>
+  </div>
+</section>
+
+<!-- ASSET QUALITY -->
+<section id="asset">
+  <h2><span class="n">02</span> Chất lượng tài sản &amp; lộ trình giảm rủi ro BĐS</h2>
+  <p class="lead">Nghịch lý của TCB: nợ xấu thấp nhất ngành <i>nhưng</i> tập trung BĐS cao nhất ngành. Ban lãnh đạo đang chủ động "hạ nhiệt".</p>
+  <div class="two">
+    <div class="chartbox">
+      <h3>NPL &amp; Độ bao phủ nợ xấu</h3>
+      <p>Nợ xấu đi xuống, bao phủ đi lên — tấm đệm dày dần.</p>
+      <div class="chart-h"><canvas id="cNpl"></canvas></div>
+    </div>
+    <div class="chartbox">
+      <h3>Lộ trình giảm tỷ trọng tín dụng nhóm rủi ro (ReCom)</h3>
+      <p>Cam kết kéo BĐS/xây dựng/VLXD từ ~37% → 25% danh mục (mục tiêu 2030).</p>
+      <div class="chart-h"><canvas id="cRecom"></canvas></div>
+    </div>
+  </div>
+  <div class="two" style="margin-top:18px">
+    <div class="chartbox">
+      <h3>Dư nợ BĐS (kinh doanh) — đỉnh rồi giảm</h3>
+      <p>Đỉnh Q3/2025 ~237.838 tỷ → "bốc hơi" gần 39.000 tỷ về 198.854 tỷ (Q1/2026).</p>
+      <div class="chart-h"><canvas id="cBdsBal"></canvas></div>
+    </div>
+    <div class="chartbox">
+      <h3>Chuyển dịch cơ cấu: từ doanh nghiệp/BĐS → bán lẻ</h3>
+      <p>Tăng trưởng tín dụng YTD theo phân khúc (CFO A. Macaire, T1/2026).</p>
+      <div class="chart-h"><canvas id="cShift"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROFITABILITY -->
+<section id="profit">
+  <h2><span class="n">03</span> Hiệu quả sinh lời &amp; tăng trưởng</h2>
+  <p class="lead">Lợi nhuận 9T/2025 gần như đi ngang (+2,4%) nhưng Q3 lập kỷ lục — hình thái "tạo đáy &amp; hồi phục". NIM co lại rồi ổn định.</p>
+  <div class="two">
+    <div class="chartbox">
+      <h3>NIM &amp; lợi suất tài sản / chi phí vốn</h3>
+      <p>NIM giảm từ 4,2%→3,8%; môi giới dự phóng phục hồi ~4,0-4,2% (2026-27).</p>
+      <div class="chart-h"><canvas id="cNim"></canvas></div>
+    </div>
+    <div class="chartbox">
+      <h3>Lợi nhuận trước thuế qua các năm</h3>
+      <p>FY24 27.538 tỷ → FY25 32.538 tỷ (+18,2%). Dự phóng NPAT-MI tiếp tục tăng.</p>
+      <div class="chart-h"><canvas id="cPbt"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUATION -->
+<section id="valuation">
+  <h2><span class="n">04</span> Định giá so với ngành</h2>
+  <p class="lead">"Nghịch lý định giá": P/B cao hơn ngành nhưng ROE lại thấp hơn median — điểm gợn chính. Bù lại, P/E tuyệt đối thấp (~7,4x).</p>
+  <div class="three">
+    <div class="chartbox">
+      <h3>P/B: TCB vs ngành</h3>
+      <p>Premium ~+12% so median; 0,75 SD trên TB 5 năm.</p>
+      <div class="chart-h" style="height:260px"><canvas id="cPb"></canvas></div>
+    </div>
+    <div class="chartbox">
+      <h3>ROE: TCB vs ngành</h3>
+      <p>Dưới median ngành — phần nào do pha loãng vốn IPO TCBS.</p>
+      <div class="chart-h" style="height:260px"><canvas id="cRoe"></canvas></div>
+    </div>
+    <div class="chartbox">
+      <h3>Cơ cấu định giá</h3>
+      <p>P/E thấp + P/B premium = chất lượng sổ sách cao.</p>
+      <div class="chart-h" style="height:260px"><canvas id="cValmix"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- ECOSYSTEM -->
+<section id="eco">
+  <h2><span class="n">05</span> Hệ sinh thái &amp; rủi ro bên liên quan</h2>
+  <p class="lead">
+    TCB nằm ở trung tâm một mạng lưới sở hữu chéo do gia đình <b>Hồ Hùng Anh</b> và đồng minh <b>Masan</b> (Nguyễn Đăng Quang) kiểm soát.
+    Đây là phần "đào sâu" trả lời trực tiếp lo ngại Vingroup / Masterise / One Mount.
+  </p>
+
+  <div class="two">
+    <div class="chartbox">
+      <h3>Cơ cấu sở hữu TCB (theo nhóm)</h3>
+      <p>Nhóm gia đình &amp; người liên quan ~33% + khối Masan ~20% → chi phối tuyệt đối.</p>
+      <div class="chart-h"><canvas id="cOwn"></canvas></div>
+    </div>
+    <div class="chartbox">
+      <h3>Sở hữu trực tiếp của gia đình Hồ Hùng Anh tại TCB</h3>
+      <p>Chủ tịch chỉ giữ ~1,1% — quyền sở hữu phân tán trong gia đình (~19,8%).</p>
+      <div class="chart-h"><canvas id="cFam"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h3 style="margin:0 0 4px">🗺️ Bản đồ liên kết: ai kiểm soát ai</h3>
+    <p style="color:var(--muted);font-size:13.5px;margin:0 0 16px">
+      TCB <b>không sở hữu cổ phần trực tiếp</b> tại Masterise/One Mount — liên kết đi qua <b>con người</b> trong gia đình.
+      Mắt xích "nội bộ" then chốt: <b>Hồ Anh Ngọc</b> (em trai chủ tịch) — Phó CT TCB <i>đồng thời</i> Chủ tịch One Mount &amp; sở hữu &gt;10% Masterise.
+    </p>
+    <div class="eco">
+      <div class="node person"><div class="role">Cá nhân kiểm soát</div><div class="name">Gia đình Hồ Hùng Anh</div><div class="own">~33% TCB (gồm người liên quan)</div></div>
+      <div class="node center"><div class="role">Ngân hàng tài trợ</div><div class="name">⭐ Techcombank (TCB)</div><div class="own">HOSE · vốn hóa lớn</div></div>
+      <div class="node person"><div class="role">Đồng minh / cổ đông tổ chức</div><div class="name">Masan Group</div><div class="own">~20% TCB · ô. N.Đ.Quang là Phó CT TCB</div></div>
+    </div>
+    <div class="arrowrow">▼ &nbsp; kiểm soát qua sở hữu cá nhân &gt;10% &amp; ghế lãnh đạo &nbsp; ▼</div>
+    <div class="eco">
+      <div class="node"><div class="role">BĐS cao cấp</div><div class="name">Masterise Group / Homes</div><div class="own">Vợ · con (CEO Hồ Anh Minh) · em trai &gt;10% mỗi người</div></div>
+      <div class="node"><div class="role">Tech / dịch vụ</div><div class="name">One Mount Group</div><div class="own">Vợ làm Chủ tịch · Vingroup lập 2019, đã thoái 100% (T3/2022)</div></div>
+      <div class="node"><div class="role">Chứng khoán (con của TCB)</div><div class="name">TCBS</div><div class="own">~50% thị phần MG trái phiếu · định giá ~5 tỷ USD</div></div>
+    </div>
+    <div class="legend">
+      <span style="--c:var(--accent)"><span style="background:var(--accent)"></span>Trung tâm: ngân hàng cấp vốn</span>
+      <span><span style="background:var(--purple)"></span>Pháp nhân BĐS/dịch vụ do gia đình kiểm soát</span>
+      <span><span style="background:var(--muted)"></span>Liên kết qua cá nhân (không qua sở hữu của TCB)</span>
+    </div>
+    <div class="callout" style="margin-top:18px">
+      🔎 <b>Vingroup:</b> đã <b>thoái sạch</b> One Mount từ T3/2022 (~600 triệu USD). Liên hệ TCB–Vingroup hiện nay chủ yếu là
+      <b>quan hệ tín dụng/BĐS</b> (TCB tài trợ dự án Vinhomes...) chứ không phải sở hữu chéo. Điểm còn bỏ ngỏ: quy mô dư nợ/trái phiếu
+      <i>theo từng tên</i> (Vinhomes/Masterise) không được công bố tách bạch — chỉ có tổng ngành BĐS.
+    </div>
+  </div>
+</section>
+
+<!-- RISK -->
+<section id="risk">
+  <h2><span class="n">06</span> Cân đối Điểm mạnh ⚖️ Rủi ro</h2>
+  <div class="two">
+    <div class="card">
+      <h3 style="margin-top:0;color:var(--good)">✓ Điểm mạnh (độ tin cậy cao)</h3>
+      <ul class="clean pro">
+        <li><b>Tài sản tốt nhất hệ thống:</b> NPL ~1,1%, bao phủ ~120-128%, NPL khối BĐS = 0%.</li>
+        <li><b>CASA số 1 ngành (42,5%)</b> → chi phí vốn rẻ, bền vững.</li>
+        <li><b>Vốn mạnh</b> (CAR 14,6-15,8%) sau IPO TCBS — dư địa tăng trưởng.</li>
+        <li><b>LNTT 2025 +18,2%</b>; Q1/2026 +22,6% — đà hồi phục rõ.</li>
+        <li><b>Ban lãnh đạo chủ động giảm rủi ro</b> BĐS (lần đầu &lt;30%) &amp; đẩy bán lẻ.</li>
+        <li><b>Định giá P/E thấp (~7,4x)</b>; cả 3 CTCK khuyến nghị MUA/OUTPERFORM.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;color:var(--bad)">! Rủi ro cốt lõi</h3>
+      <ul class="clean con">
+        <li><b>Tập trung BĐS cao nhất ngành</b> (~58-70% danh mục liên quan BĐS) → phụ thuộc chu kỳ địa ốc.</li>
+        <li><b>Rủi ro bên liên quan / "sân sau":</b> gia đình vừa kiểm soát ngân hàng (~33%) vừa kiểm soát Masterise &amp; One Mount; Phó CT Hồ Anh Ngọc là mắt xích nội bộ.</li>
+        <li><b>Thiếu minh bạch số liệu</b> dư nợ/trái phiếu theo từng tên trong hệ sinh thái — chỉ có tổng ngành.</li>
+        <li><b>Ký ức trái phiếu 2022-23:</b> TCB từng giữ TPDN lớn nhất (60.663 tỷ, 2019) &amp; quỹ TCBF từng bị rút mạnh.</li>
+        <li><b>NIM co lại</b> (4,2%→3,8%); ROE dưới median ngành.</li>
+        <li><b>Cổ tức tiền mặt thấp</b> (~2,6-2,8%) — không hợp NĐT cần thu nhập.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h3 style="margin-top:0;color:var(--blue)">? Câu hỏi còn bỏ ngỏ (cần theo dõi)</h3>
+    <ul class="clean q">
+      <li>Quy mô dư nợ &amp; trái phiếu TCB tài trợ/thu xếp <b>riêng cho Vinhomes/Masterise</b> là bao nhiêu? (không công bố tách bạch)</li>
+      <li>Lộ trình giảm ReCom 37%→25% có giữ đúng tiến độ trong số liệu 2026-2030 không?</li>
+      <li>NIM/ROE thực tế 2026 so với dự phóng môi giới ra sao?</li>
+      <li>Khung quản trị cho vay bên liên quan thực sự giới hạn đến đâu (ngưỡng phê duyệt HĐQT, trần theo Luật TCTD)?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- TARGETS -->
+<section id="targets">
+  <h2><span class="n">07</span> Khuyến nghị nhà phân tích</h2>
+  <p class="lead">Tất cả CTCK phủ sóng đều tích cực. Giá mục tiêu tăng dần suốt 2025 theo đà giá. Mới nhất &amp; cao nhất: KBSV T12/2025.</p>
+  <div class="card">
+    <table>
+      <thead><tr><th>CTCK / Thời điểm</th><th>Khuyến nghị</th><th>Giá mục tiêu</th><th>Upside</th><th>Tầm nhìn</th></tr></thead>
+      <tbody>
+        <tr><td><b>KBSV</b> · T12/2025 <span class="pill g">mới nhất</span></td><td><span class="pill g">MUA</span></td><td><b>43.100đ</b></td><td class="pos">~+28%</td><td>Cuối 2026</td></tr>
+        <tr><td>Vietcap · T8/2025</td><td><span class="pill y">OUTPERFORM</span></td><td>40.800đ</td><td class="pos">+10,7% TSR</td><td>Hạ từ BUY <i>do giá đã chạy +36,8%</i></td></tr>
+        <tr><td>BSC · T6/2026</td><td><span class="pill g">MUA</span></td><td>42.800đ</td><td class="pos">~+37%</td><td>Giữ vĩ mô thận trọng</td></tr>
+        <tr><td>KBSV · T5/2025</td><td><span class="pill g">MUA</span></td><td>35.600đ</td><td class="pos">+16,2%</td><td>—</td></tr>
+        <tr><td>KBSV · T3/2025</td><td><span class="pill g">MUA</span></td><td>36.200đ</td><td class="pos">+38%</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--muted);font-size:12.5px;margin:14px 0 0">
+      ⚠️ Báo cáo môi giới vốn thiên về khuyến nghị MUA; con số "F" (dự phóng) không phải kết quả thực hiện.
+    </p>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<section id="sources">
+  <h2><span class="n">08</span> Nguồn &amp; phương pháp</h2>
+  <div class="card">
+    <p style="margin-top:0;font-size:14px">
+      Tổng hợp từ <b>2 vòng deep-research</b> (fan-out tìm kiếm → fetch nguồn → verify đối nghịch 3 phiếu/claim → tổng hợp).
+      <b>Vòng 1 (cơ bản):</b> 22 nguồn, 99 claim → 23 xác nhận. <b>Vòng 2 (hệ sinh thái):</b> 24 nguồn, 101 claim → 24 xác nhận.
+    </p>
+    <p style="font-size:13px;color:var(--muted)"><b>Nguồn sơ cấp & chính:</b></p>
+    <ul class="src" style="line-height:1.9;padding-left:18px">
+      <li>Công bố KQKD 9T/2025 &amp; FY2025 của Techcombank (IR chính thức)</li>
+      <li>Báo cáo KBSV (TCB Update T3/T5/T12-2025), Vietcap (TCB-20250811-OP)</li>
+      <li>Công bố cổ đông &gt;1% theo Luật TCTD sửa đổi (hiệu lực 1/7/2024) — VnExpress, DNSE, VietnamNet</li>
+      <li>Phụ Nữ VN (loạt bài hệ sinh thái TCB–Masan), dff.vn (One Mount–Masterise–TCB)</li>
+      <li>Tuổi Trẻ, Vietnambiz (Q1/2026: BĐS lần đầu &lt;30%), Đầu Tư VN (TPDN 2019)</li>
+    </ul>
+    <div class="disclaimer">
+      ⚖️ <b>Cảnh báo &amp; giới hạn:</b> (1) Phần lớn dữ liệu là <b>công bố của chính TCB</b> (có thiên kiến tự đánh giá) và
+      <b>báo cáo môi giới</b> (thiên về MUA). (2) Tỷ lệ sở hữu là số liệu thời điểm, thay đổi sau tăng vốn/chia cổ phiếu;
+      "gia đình trực tiếp" ~19,8% vs "người có liên quan" ~33% là hai phạm vi khác nhau. (3) <b>Khoảng trống dữ liệu:</b>
+      không có số liệu dư nợ/trái phiếu <i>theo từng tên</i> (Vinhomes/Masterise) — chỉ có tổng ngành BĐS.
+      (4) <b>Đây là tài liệu thông tin, KHÔNG phải khuyến nghị đầu tư.</b> Bạn tự chịu trách nhiệm cho quyết định của mình.
+    </div>
+  </div>
+</section>
+
+<footer>
+  Báo cáo tạo tự động bởi VNStock Agent · Deep-Research harness · Dữ liệu tham chiếu đến Q1/2026<br>
+  Cổ phiếu TCB (HOSE) · Tài liệu phục vụ nghiên cứu — không phải lời khuyên đầu tư
+</footer>
+
+</div>
+
+<script>
+const FONT = "'Segoe UI',system-ui,sans-serif";
+Chart.defaults.color = '#9aa7c2';
+Chart.defaults.font.family = FONT;
+Chart.defaults.borderColor = 'rgba(39,50,79,.6)';
+const C = {red:'#e30613',red2:'#ff4d5e',good:'#2ecc71',warn:'#f4b740',blue:'#4d9bff',purple:'#9b6dff',teal:'#27d6c4',muted:'#5b6a8a'};
+const gMoney = v => v.toLocaleString('vi-VN');
+
+// 1. NPL & coverage
+new Chart(cNpl,{type:'bar',
+  data:{labels:['Q3/24','FY24','2Q25','3Q25','FY25'],
+    datasets:[
+      {type:'line',label:'Bao phủ nợ xấu (%)',data:[null,114,null,120,127.9],yAxisID:'y1',borderColor:C.good,backgroundColor:C.good,tension:.35,pointRadius:4,borderWidth:3},
+      {type:'bar',label:'NPL (%)',data:[1.35,1.12,1.30,1.19,1.13],yAxisID:'y',backgroundColor:C.red2,borderRadius:6,barPercentage:.55}
+    ]},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},
+    scales:{y:{title:{display:true,text:'NPL %'},min:0,max:2},y1:{position:'right',title:{display:true,text:'Bao phủ %'},min:0,max:160,grid:{drawOnChartArea:false}}}}});
+
+// 2. ReCom roadmap
+new Chart(cRecom,{type:'line',
+  data:{labels:['2024','2025','2026','2027','2028','2030'],
+    datasets:[{label:'Tỷ trọng ReCom (BĐS/XD/VLXD) %',data:[36,35,34,32,29,25],
+      borderColor:C.warn,backgroundColor:'rgba(244,183,64,.15)',fill:true,tension:.3,pointRadius:4,borderWidth:3}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'},
+    tooltip:{callbacks:{label:c=>' '+c.parsed.y+'% danh mục tín dụng'}}},
+    scales:{y:{min:20,max:40,title:{display:true,text:'% tổng tín dụng'}}}}});
+
+// 3. BĐS balance
+new Chart(cBdsBal,{type:'bar',
+  data:{labels:['2024','Q3/2025 (đỉnh)','Q1/2026'],
+    datasets:[{label:'Dư nợ BĐS kinh doanh (tỷ đồng)',data:[187100,237838,198854],
+      backgroundColor:[C.muted,C.red,C.teal],borderRadius:8,barPercentage:.6}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:c=>' '+gMoney(c.parsed.y)+' tỷ đồng'}}},
+    scales:{y:{title:{display:true,text:'tỷ đồng'},ticks:{callback:v=>gMoney(v)}}}}});
+
+// 4. Credit shift YTD
+new Chart(cShift,{type:'bar',indexAxis:'y',
+  data:{labels:['Vay tín chấp cá nhân','Bán lẻ / cá nhân','Doanh nghiệp'],
+    datasets:[{label:'Tăng trưởng YTD (%)',data:[248,31,13],
+      backgroundColor:[C.purple,C.good,C.muted],borderRadius:6,barPercentage:.6}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:c=>' +'+c.parsed.x+'% YTD'}}},
+    scales:{x:{title:{display:true,text:'% tăng trưởng YTD'},ticks:{callback:v=>v+'%'}}}}});
+
+// 5. NIM
+new Chart(cNim,{type:'line',
+  data:{labels:['Q3/24','1Q25','2Q25','3Q25','2026F','2027F'],
+    datasets:[
+      {label:'NIM (12T) %',data:[4.2,4.06,3.8,3.8,4.1,4.17],borderColor:C.red2,backgroundColor:'rgba(255,77,94,.12)',fill:true,tension:.3,pointRadius:4,borderWidth:3,borderDash:[]},
+      {label:'Lợi suất tài sản %',data:[null,null,null,7.0,null,null],borderColor:C.blue,pointRadius:5,showLine:false},
+      {label:'Chi phí vốn %',data:[null,null,null,3.4,null,null],borderColor:C.warn,pointRadius:5,showLine:false}
+    ]},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'},
+    subtitle:{display:true,text:'2026F-2027F: dự phóng KBSV',color:C.muted}},
+    scales:{y:{min:3,max:7.5,title:{display:true,text:'%'}}}}});
+
+// 6. PBT
+new Chart(cPbt,{type:'bar',
+  data:{labels:['2024','2025','2025F NPAT-MI','2026F NPAT-MI'],
+    datasets:[{label:'tỷ đồng',data:[27538,32538,25153,30203],
+      backgroundColor:[C.muted,C.red,C.blue,C.blue],borderRadius:8,barPercentage:.6}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+    subtitle:{display:true,text:'LNTT (2024-2025) · NPAT-MI dự phóng (KBSV)',color:C.muted},
+    tooltip:{callbacks:{label:c=>' '+gMoney(c.parsed.y)+' tỷ'}}},
+    scales:{y:{title:{display:true,text:'tỷ đồng'},ticks:{callback:v=>gMoney(v)}}}}});
+
+// 7. P/B
+new Chart(cPb,{type:'bar',
+  data:{labels:['TCB','Median ngành','TB 5 năm TCB'],
+    datasets:[{label:'P/B (x)',data:[1.65,1.47,1.36],backgroundColor:[C.red,C.muted,C.blue],borderRadius:8,barPercentage:.6}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'lần (x)'}}}}});
+
+// 8. ROE
+new Chart(cRoe,{type:'bar',
+  data:{labels:['TCB 2025F','Median ngành','TCB TB 25-29F'],
+    datasets:[{label:'ROE %',data:[16.4,18.5,18.7],backgroundColor:[C.red,C.muted,C.good],borderRadius:8,barPercentage:.6}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:c=>' '+c.parsed.y+'%'}}},scales:{y:{title:{display:true,text:'%'}}}}});
+
+// 9. Valuation mix (radar-ish doughnut substitute -> simple bar of P/E)
+new Chart(cValmix,{type:'doughnut',
+  data:{labels:['P/E ~7,4x (rẻ)','Phần bù P/B (+12%)'],
+    datasets:[{data:[74,26],backgroundColor:[C.teal,C.warn],borderColor:'#121a30',borderWidth:3}]},
+  options:{maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom'},
+    tooltip:{callbacks:{label:c=>c.label}}}}});
+
+// 10. Ownership groups
+new Chart(cOwn,{type:'doughnut',
+  data:{labels:['Gia đình Hồ Hùng Anh & người liên quan (~33%)','Khối Masan (~20%)','Cổ đông khác (~47%)'],
+    datasets:[{data:[33,20,47],backgroundColor:[C.red,C.purple,C.muted],borderColor:'#121a30',borderWidth:3}]},
+  options:{maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom'},
+    tooltip:{callbacks:{label:c=>' '+c.label}}}}});
+
+// 11. Family direct stakes
+new Chart(cFam,{type:'bar',indexAxis:'y',
+  data:{labels:['Vợ (N.T.Thanh Thủy)','Con: Hồ Anh Minh','Con: Hồ Thủy Anh','Con: Hồ Minh Anh','Em dâu N.Hương Liên','CT Hồ Hùng Anh'],
+    datasets:[{label:'% vốn TCB',data:[4.94,4.9,4.9,2.0,1.98,1.12],
+      backgroundColor:[C.red,C.red2,C.red2,C.warn,C.warn,C.blue],borderRadius:5,barPercentage:.7}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+    subtitle:{display:true,text:'Cộng dồn gia đình trực tiếp ~19,8% (số liệu giữa 2024)',color:C.muted},
+    tooltip:{callbacks:{label:c=>' '+c.parsed.x+'% vốn điều lệ'}}},
+    scales:{x:{title:{display:true,text:'% vốn TCB'},ticks:{callback:v=>v+'%'}}}}});
+</script>
+</body>
+</html>

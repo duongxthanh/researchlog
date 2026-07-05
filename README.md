@@ -1,14 +1,21 @@
 # researchlog
 
-Nơi chia sẻ tài liệu tự nghiên cứu — thay vì để bỏ xó sau khi đọc/phân tích xong, mình soạn lại thành báo cáo và chia sẻ công khai.
+Nơi chia sẻ tài liệu tự nghiên cứu — thay vì để bỏ xó sau khi đọc/phân tích xong, soạn lại thành báo cáo và chia sẻ công khai.
 
 Đang trong giai đoạn thử nghiệm xem có ai thấy nội dung dạng này hữu ích không, trước khi quyết định đầu tư công sức mở rộng.
 
 **Live:** https://duongxthanh.github.io/researchlog/
 
-## Tài liệu
+## Cấu trúc
 
-- **TCB — Techcombank: Phân tích chuyên sâu & Hệ sinh thái** (deep-research, tạo bởi VNStock Agent — bot cá nhân theo dõi & phân tích cổ phiếu VN) — góc nhìn nhà đầu tư dài hạn, không phải khuyến nghị đầu tư.
+- `index.html` — trang chủ, danh sách tài liệu.
+- `docs/*.html` — từng tài liệu, 1 file HTML/tài liệu.
+
+Thêm tài liệu mới: bỏ file vào `docs/`, thêm 1 card trong `index.html`.
+
+## Tài liệu hiện có
+
+- `docs/tcb-techcombank.html` — TCB (Techcombank): phân tích chuyên sâu & hệ sinh thái, góc nhìn nhà đầu tư dài hạn. Tạo bởi VNStock Agent (bot cá nhân theo dõi & phân tích cổ phiếu VN).
 
 ## Lưu ý
 
