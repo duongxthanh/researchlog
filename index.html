@@ -3,14 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>researchlog: tài liệu tự nghiên cứu, chia sẻ công khai</title>
-<meta name="description" content="Tài liệu tự nghiên cứu (deep-research, ghi chú, phân tích), chia sẻ công khai thay vì để bỏ xó. Tích luỹ dần theo thời gian.">
-<meta property="og:title" content="researchlog: tài liệu tự nghiên cứu, chia sẻ công khai">
+<title>researchlog: thư viện tài liệu tự nghiên cứu</title>
+<meta name="description" content="Thư viện tài liệu tự nghiên cứu, chia sẻ công khai: deep-research, phân tích, ghi chú. Tích luỹ dần theo thời gian.">
+<meta property="og:title" content="researchlog: thư viện tài liệu tự nghiên cứu">
 <meta property="og:description" content="Nghiên cứu xong rồi bỏ xó thì phí. Nơi lưu lại và chia sẻ, tích luỹ dần theo thời gian.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://duongxthanh.github.io/researchlog/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1020'/%3E%3Crect x='16' y='14' width='26' height='34' rx='3' fill='none' stroke='%23e8edf7' stroke-width='3'/%3E%3Cline x1='22' y1='24' x2='36' y2='24' stroke='%23e8edf7' stroke-width='3' stroke-linecap='round'/%3E%3Cline x1='22' y1='32' x2='36' y2='32' stroke='%23e30613' stroke-width='3' stroke-linecap='round'/%3E%3Cline x1='22' y1='40' x2='31' y2='40' stroke='%23e8edf7' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<!-- Danh mục tài liệu, dạng máy đọc được (agent-ready cho ChatGPT/Perplexity). Cập nhật khi thêm tài liệu. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "researchlog",
+  "description": "Thư viện tài liệu tự nghiên cứu, chia sẻ công khai.",
+  "url": "https://duongxthanh.github.io/researchlog/",
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "url": "https://duongxthanh.github.io/researchlog/docs/tcb-techcombank.html",
+        "name": "TCB (Techcombank): Phân tích chuyên sâu & Hệ sinh thái"
+      }
+    ]
+  }
+}
+</script>
+
 <style>
   @font-face{
     font-family:'Space Grotesk';font-style:normal;font-weight:500;font-display:swap;
@@ -34,100 +57,181 @@
   }
 
   :root{
-    --bg:#0b1020; --panel:#121a30; --panel2:#1a2440; --ink:#e8edf7; --muted:#9aa7c2;
-    --line:#27324f; --accent:#e30613; --accent2:#ff4d5e;
+    --bg:#0b1020; --panel:#121a30; --panel2:#161f3a; --ink:#e8edf7; --muted:#9aa7c2; --faint:#6b7896;
+    --line:#25314e; --line2:#2f3d61; --accent:#e30613; --accent2:#ff4d5e;
+    --radius:16px;
   }
   *{box-sizing:border-box}
-  html{-webkit-font-smoothing:antialiased}
-  body{margin:0;background:
-      radial-gradient(1000px 460px at 12% -8%, rgba(227,6,19,.16), transparent 55%),
-      radial-gradient(820px 420px at 96% 4%, rgba(77,155,255,.10), transparent 55%),
-      linear-gradient(180deg,#0b1020,#0d1326 45%,#0b1020);
+  html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+  body{margin:0;
+    background:
+      radial-gradient(1100px 480px at 8% -10%, rgba(227,6,19,.15), transparent 55%),
+      radial-gradient(900px 460px at 98% -2%, rgba(77,155,255,.09), transparent 55%),
+      linear-gradient(180deg,#0b1020,#0d1326 42%,#0b1020);
+    background-attachment:fixed;
     color:var(--ink);
     font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
     line-height:1.6; min-height:100dvh}
-  h1,h2,.brand{font-family:'Space Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+  h1,h2,h3,.brand{font-family:'Space Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
 
-  .nav{max-width:920px;margin:0 auto;padding:22px 20px;display:flex;align-items:center;justify-content:space-between}
+  /* Top bar */
+  .topbar{position:sticky;top:0;z-index:20;
+    backdrop-filter:saturate(140%) blur(10px);
+    background:rgba(11,16,32,.72);border-bottom:1px solid var(--line)}
+  .topbar-in{max-width:1080px;margin:0 auto;padding:15px 22px;display:flex;align-items:center;justify-content:space-between}
   .brand{font-weight:700;font-size:17px;letter-spacing:-.01em;color:var(--ink);text-decoration:none}
-  .brand span{color:var(--accent2)}
-  .nav a.gh{color:var(--muted);text-decoration:none;font-size:14px;border:1px solid var(--line);padding:7px 14px;border-radius:8px;transition:border-color .15s,color .15s}
-  .nav a.gh:hover{border-color:var(--accent2);color:var(--ink)}
+  .brand b{color:var(--accent2);font-weight:700}
+  .topbar a.gh{color:var(--muted);text-decoration:none;font-size:13.5px;border:1px solid var(--line2);
+    padding:7px 14px;border-radius:9px;transition:border-color .15s,color .15s}
+  .topbar a.gh:hover{border-color:var(--accent2);color:var(--ink)}
 
-  .hero{max-width:920px;margin:0 auto;padding:44px 20px 12px}
-  .hero-col{max-width:660px}
-  .hero h1{font-size:clamp(30px,4.6vw,44px);line-height:1.12;font-weight:700;letter-spacing:-.02em;margin:0 0 16px;
-    opacity:0;transform:translateY(14px);animation:rise .6s cubic-bezier(.16,1,.3,1) .05s forwards}
-  .hero p{color:var(--muted);font-size:16.5px;max-width:52ch;margin:0;
-    opacity:0;transform:translateY(14px);animation:rise .6s cubic-bezier(.16,1,.3,1) .18s forwards}
+  /* Hero */
+  .hero{padding:52px 0 30px}
+  .hero h1{font-size:clamp(29px,4.4vw,42px);line-height:1.12;font-weight:700;letter-spacing:-.02em;margin:0 0 14px;max-width:15ch}
+  .hero p{color:var(--muted);font-size:16.5px;max-width:56ch;margin:0 0 20px}
+  .stats{display:flex;gap:22px;flex-wrap:wrap;color:var(--faint);font-size:13.5px}
+  .stats b{color:var(--ink);font-weight:700;font-family:'Space Grotesk',system-ui,sans-serif}
+  /* Nội dung hiển thị mặc định; animation chỉ là lớp tăng cường (không giấu chữ sau animation). */
+  @media (prefers-reduced-motion: no-preference){
+    .hero h1{opacity:0;transform:translateY(14px);animation:rise .6s cubic-bezier(.16,1,.3,1) .04s forwards}
+    .hero p{opacity:0;transform:translateY(14px);animation:rise .6s cubic-bezier(.16,1,.3,1) .16s forwards}
+    .stats{opacity:0;transform:translateY(14px);animation:rise .6s cubic-bezier(.16,1,.3,1) .26s forwards}
+  }
   @keyframes rise{to{opacity:1;transform:translateY(0)}}
-  @media (prefers-reduced-motion: reduce){
-    .hero h1,.hero p{animation:none;opacity:1;transform:none}
+
+  /* Shelf (1 category) */
+  .shelf{padding:14px 0 40px}
+  .shelf-head{display:flex;align-items:baseline;gap:12px;margin:0 0 20px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .shelf-head h2{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:0}
+  .shelf-head .count{font-size:13px;color:var(--faint)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+
+  /* Card (base = vertical, dùng cho tài liệu thường) */
+  .card{display:flex;flex-direction:column;overflow:hidden;text-decoration:none;color:inherit;
+    background:linear-gradient(180deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:var(--radius);
+    transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+  .card:hover{border-color:rgba(255,77,94,.5);transform:translateY(-3px);
+    box-shadow:0 18px 40px -18px rgba(0,0,0,.7)}
+  .card-media{position:relative;aspect-ratio:16/10;overflow:hidden;background:#0d1326}
+  .card-media img{width:100%;height:100%;object-fit:cover;object-position:left top;display:block;
+    transition:transform .35s cubic-bezier(.16,1,.3,1)}
+  .card:hover .card-media img{transform:scale(1.035)}
+  .card-media::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,transparent 62%,rgba(11,16,32,.55));}
+  .card-media .tag{position:absolute;left:14px;bottom:12px;z-index:2;
+    font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;
+    background:rgba(227,6,19,.9);padding:5px 10px;border-radius:7px}
+  .card-body{display:flex;flex-direction:column;flex:1;padding:18px 20px 20px}
+  .card-body h3{font-size:17.5px;font-weight:700;letter-spacing:-.01em;line-height:1.28;margin:0 0 8px}
+  .card-body p{margin:0;color:var(--muted);font-size:14px;line-height:1.55;flex:1}
+  .card-foot{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .card-foot .meta{font-size:12px;color:var(--faint)}
+  .card-foot .go{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;
+    transition:color .18s ease,transform .18s ease}
+  .card:hover .card-foot .go{color:var(--accent2);transform:translateX(2px)}
+
+  /* Featured (tài liệu mới nhất / nổi bật): chiếm cả hàng, ngang trên desktop */
+  .card--featured{grid-column:1 / -1}
+  @media (min-width:760px){
+    .card--featured{flex-direction:row}
+    .card--featured .card-media{aspect-ratio:auto;flex:0 0 54%;min-height:300px}
+    .card--featured .card-media::after{background:linear-gradient(90deg,transparent 70%,rgba(11,16,32,.35))}
+    .card--featured .card-body{padding:30px 32px}
+    .card--featured .card-body h3{font-size:23px;margin-bottom:12px}
+    .card--featured .card-body p{font-size:15px}
   }
 
-  main{max-width:1040px;margin:0 auto;padding:40px 20px 24px}
-
-  .category{margin-bottom:44px}
-  .category:last-child{margin-bottom:0}
-  .cat-head{display:flex;align-items:baseline;gap:10px;margin:0 0 20px;padding-bottom:14px;border-bottom:1px solid var(--line)}
-  .cat-head h2{font-size:20px;font-weight:700;font-family:'Space Grotesk',system-ui,sans-serif;letter-spacing:-.01em;margin:0;color:var(--ink)}
-  .cat-head .count{font-size:13px;color:var(--muted)}
-
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-  .card{display:flex;flex-direction:column;background:linear-gradient(180deg,var(--panel),var(--panel2));
-    border:1px solid var(--line);border-radius:16px;padding:24px;text-decoration:none;color:inherit;
-    transition:border-color .18s,transform .18s}
-  .card:hover{border-color:rgba(255,77,94,.5);transform:translateY(-2px)}
-  .card:hover .go{color:var(--accent2);transform:translateX(2px)}
-  .card .tag{font-size:11.5px;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
-  .card h3{margin:10px 0 8px;font-size:19px;font-weight:700;font-family:'Space Grotesk',system-ui,sans-serif;letter-spacing:-.01em}
-  .card p{margin:0;color:var(--muted);font-size:14.5px;flex:1}
-  .card .foot{margin-top:18px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#6b7896}
-  .card .go{color:var(--muted);font-size:13.5px;font-weight:600;transition:color .18s,transform .18s}
-
-  footer{max-width:920px;margin:20px auto 0;padding:24px 20px 60px;border-top:1px solid var(--line);
-    color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between}
+  /* Footer */
+  footer{border-top:1px solid var(--line);margin-top:16px}
+  .footer-in{max-width:1080px;margin:0 auto;padding:26px 22px 64px;
+    display:flex;flex-wrap:wrap;gap:10px 20px;justify-content:space-between;align-items:center;
+    color:var(--faint);font-size:12.5px}
   footer a{color:var(--accent2);text-decoration:none}
   footer a:hover{text-decoration:underline}
+
+  @media (prefers-reduced-motion: reduce){
+    .hero h1,.hero p,.stats{animation:none;opacity:1;transform:none}
+    .card,.card-media img,.card-foot .go{transition:none}
+  }
 </style>
 </head>
 <body>
-  <nav class="nav">
-    <a class="brand" href="./">research<span>log</span></a>
-    <a class="gh" href="https://github.com/duongxthanh/researchlog">GitHub</a>
-  </nav>
-
-  <header class="hero">
-    <div class="hero-col">
-      <h1>Tài liệu tự nghiên cứu, chia sẻ công khai</h1>
-      <p>Nghiên cứu xong rồi bỏ xó thì phí. Nơi này lưu lại và chia sẻ, tích luỹ dần theo thời gian.</p>
+  <header class="topbar">
+    <div class="topbar-in">
+      <a class="brand" href="./">research<b>log</b></a>
+      <a class="gh" href="https://github.com/duongxthanh/researchlog">GitHub</a>
     </div>
   </header>
 
-  <main>
-    <!-- 1 section = 1 category. Thêm category mới: copy khối <section class="category"> này, đổi tên + grid. -->
-    <section class="category">
-      <div class="cat-head">
+  <div class="wrap">
+    <section class="hero">
+      <h1>Thư viện tài liệu tự nghiên cứu</h1>
+      <p>Nghiên cứu xong rồi bỏ xó thì phí. Nơi này lưu lại và chia sẻ công khai, tích luỹ dần theo thời gian.</p>
+      <div class="stats">
+        <span><b>1</b> tài liệu</span>
+        <span><b>1</b> chủ đề</span>
+        <span>Cập nhật <b>07/2026</b></span>
+      </div>
+    </section>
+
+    <!-- ===== KỆ THEO CATEGORY =====
+         Mỗi <section class="shelf"> = 1 category. Thêm category mới: copy cả khối shelf.
+         Bài mới nhất / nổi bật để class="card card--featured" (thẻ lớn ngang).
+         Ngưỡng thích ứng: khi tổng số tài liệu >= 4 (hoặc >= 2 category) thì thêm
+         thanh filter chips + ô search ở đây (JS chỉ ẩn/hiện thẻ tĩnh, không render từ JSON). -->
+    <section class="shelf" data-category="chung-khoan">
+      <div class="shelf-head">
         <h2>Chứng khoán</h2>
         <span class="count">1 tài liệu</span>
       </div>
       <div class="grid">
-        <a class="card" href="docs/tcb-techcombank.html">
-          <span class="tag">Deep-research</span>
-          <h3>TCB (Techcombank): Phân tích chuyên sâu &amp; Hệ sinh thái</h3>
-          <p>Góc nhìn nhà đầu tư dài hạn: chất lượng tài sản, định giá, và bản đồ sở hữu chéo trong hệ sinh thái. Tạo bởi VNStock Agent, không phải khuyến nghị đầu tư.</p>
-          <div class="foot">
-            <span>07/2026</span>
-            <span class="go">Xem báo cáo →</span>
+
+        <a class="card card--featured" href="docs/tcb-techcombank.html">
+          <div class="card-media">
+            <img src="assets/thumbs/tcb-techcombank.webp" width="1080" height="567"
+                 alt="Báo cáo TCB: tiêu đề, điểm 7.2/10 dài hạn và kết luận đáng đầu tư có điều kiện" loading="eager">
+            <span class="tag">Deep-research</span>
+          </div>
+          <div class="card-body">
+            <h3>TCB (Techcombank): Phân tích chuyên sâu &amp; Hệ sinh thái</h3>
+            <p>Góc nhìn nhà đầu tư dài hạn: chất lượng tài sản, hiệu quả sinh lời, định giá so với ngành, và bản đồ sở hữu chéo trong hệ sinh thái gia đình Hồ Hùng Anh. Không phải khuyến nghị đầu tư.</p>
+            <div class="card-foot">
+              <span class="meta">07/2026 · VNStock Agent</span>
+              <span class="go">Xem báo cáo →</span>
+            </div>
           </div>
         </a>
+
+        <!-- TEMPLATE thẻ tài liệu thường (copy khối này khi thêm tài liệu mới):
+        <a class="card" href="docs/<slug>.html">
+          <div class="card-media">
+            <img src="assets/thumbs/<slug>.webp" width="1080" height="675" alt="<mô tả ảnh>" loading="lazy">
+            <span class="tag"><Loại></span>
+          </div>
+          <div class="card-body">
+            <h3><Tiêu đề></h3>
+            <p><Mô tả ngắn 1-2 dòng.></p>
+            <div class="card-foot">
+              <span class="meta"><MM/YYYY · nguồn></span>
+              <span class="go">Xem →</span>
+            </div>
+          </div>
+        </a>
+        -->
+
       </div>
     </section>
-  </main>
+  </div>
 
   <footer>
-    <span>Tài liệu ở đây là research/ghi chú cá nhân, không phải khuyến nghị đầu tư hay tư vấn tài chính. Tự chịu trách nhiệm cho quyết định của bạn.</span>
-    <a href="https://github.com/duongxthanh/researchlog">Mã nguồn trên GitHub</a>
+    <div class="footer-in">
+      <span>Tài liệu ở đây là research/ghi chú cá nhân, không phải khuyến nghị đầu tư hay tư vấn tài chính. Tự chịu trách nhiệm cho quyết định của bạn.</span>
+      <a href="https://github.com/duongxthanh/researchlog">Mã nguồn trên GitHub</a>
+    </div>
   </footer>
 </body>
 </html>
